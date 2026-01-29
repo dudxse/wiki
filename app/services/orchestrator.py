@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Literal, cast
+from typing import Literal
 
 from sqlalchemy.orm import Session
 
@@ -54,14 +54,10 @@ class SummaryOrchestrator:
         normalized = self._normalize_url(url)
 
         if word_count is None:
-            return cast(
-                Summary | None,
-                summaries_repo.get_latest_by_url(self.session, normalized),
-            )
+            return summaries_repo.get_latest_by_url(self.session, normalized)
 
-        return cast(
-            Summary | None,
-            summaries_repo.get_by_url_and_word_count(self.session, normalized, word_count),
+        return summaries_repo.get_by_url_and_word_count(
+            self.session, normalized, word_count
         )
 
     def get_or_create_summary(self, url: str, word_count: int) -> tuple[Summary, SourceLiteral]:
@@ -74,7 +70,7 @@ class SummaryOrchestrator:
         )
         if existing is not None:
             logger.info("Orchestrator: Returning cached summary for %s", normalized_url)
-            return cast(Summary, existing), "cache"
+            return existing, "cache"
 
         # 2. Scrape Wikipedia
         try:
@@ -115,4 +111,4 @@ class SummaryOrchestrator:
         source: SourceLiteral = "generated" if created_new else "cache"
         logger.info("Orchestrator: %s summary for %s", source.capitalize(), normalized_url)
 
-        return cast(Summary, summary_obj), source
+        return summary_obj, source
