@@ -1,0 +1,17 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+dist/
+build/
+*.egg-info/
+.DS_Store
+Thumbs.db
+.temp_ag_kit
+result.json
+desafio.md
