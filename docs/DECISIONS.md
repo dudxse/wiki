@@ -27,6 +27,19 @@ aceitos para manter a solução robusta, clara e pronta para produção em uma A
 - Decisão: sumarizar com LLM e usar fallback extrativo quando o LLM falha.
 - Por quê: mantém a API usável em falhas do LLM ou chaves inválidas.
 - Trade-off: a qualidade do fallback é menor do que a do LLM.
+- Decisão: adicionar retentativas com backoff para chamadas ao LLM.
+- Por quê: reduz falhas transitórias (ex.: rate limit ou instabilidades momentâneas).
+- Trade-off: pode aumentar a latência em casos de erro.
+
+## Sumarização por chunks (map-reduce)
+- Decisão: quando o artigo é muito longo, dividir em chunks, resumir cada parte e reduzir.
+- Por quê: evita estouro de limites de tokens e melhora robustez para textos extensos.
+- Trade-off: custo maior (mais chamadas ao LLM) e possível perda de nuances entre chunks.
+
+## Saída estruturada (JSON)
+- Decisão: solicitar JSON do LLM e fazer parsing defensivo.
+- Por quê: reduz variabilidade e facilita validação do output.
+- Trade-off: depende de compliance do modelo; há fallback para texto bruto.
 
 ## Comportamento de tradução
 - Decisão: tradução para português é best-effort e não falha a requisição.
@@ -37,3 +50,5 @@ aceitos para manter a solução robusta, clara e pronta para produção em uma A
 - Decisão: logs estruturados em JSON com request ID; rate limit opcional via Redis.
 - Por quê: melhora depuração e prontidão para produção.
 - Trade-off: Redis é necessário para o rate limit completo; testes desabilitam essa dependência.
+- Decisão: incluir hash de prompt e metadados do LLM nos logs.
+- Por quê: facilita auditoria e rastreio de versões de prompts em produção.

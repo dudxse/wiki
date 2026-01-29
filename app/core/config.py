@@ -154,6 +154,16 @@ class Settings(BaseSettings):
         alias="LLM_TIMEOUT_SECONDS",
         description="Timeout for LLM requests in seconds.",
     )
+    llm_max_retries: int = Field(
+        default_factory=partial(_env_optional_int, "LLM_MAX_RETRIES", 2),
+        alias="LLM_MAX_RETRIES",
+        description="Number of retry attempts for LLM calls on transient failures.",
+    )
+    llm_retry_backoff_seconds: float = Field(
+        default_factory=partial(_env_optional_float, "LLM_RETRY_BACKOFF_SECONDS", 1.0),
+        alias="LLM_RETRY_BACKOFF_SECONDS",
+        description="Base backoff (seconds) between LLM retries.",
+    )
     wikipedia_user_agent: str = Field(
         default_factory=partial(_env_required, "WIKIPEDIA_USER_AGENT"),
         alias="WIKIPEDIA_USER_AGENT",

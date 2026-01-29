@@ -2,3 +2,5 @@ Summarize the content below in approximately {word_count} words, preserving key 
 
 Content:
 {text}
+
+{format_instructions}

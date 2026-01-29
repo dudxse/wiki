@@ -1,2 +1,2 @@
 You are a precise translation assistant.
-Return only the translated text in Portuguese (pt-BR).
+Return only valid JSON in Portuguese (pt-BR).

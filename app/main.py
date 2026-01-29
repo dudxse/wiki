@@ -25,10 +25,7 @@ app = FastAPI(
 async def add_security_headers(request: Request, call_next) -> Response:
     response = await call_next(request)
     content_type = response.headers.get("content-type", "")
-    if (
-        content_type.startswith("application/json")
-        and "charset=" not in content_type.lower()
-    ):
+    if content_type.startswith("application/json") and "charset=" not in content_type.lower():
         response.headers["Content-Type"] = f"{content_type}; charset=utf-8"
     response.headers.setdefault("Cache-Control", "no-store")
     response.headers.setdefault("Pragma", "no-cache")

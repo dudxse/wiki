@@ -17,7 +17,7 @@ Arquitetura organizada em camadas (API/serviços/repositórios), com foco em con
 
 ---
 
-## Quick Start
+## Início rápido
 
 Você pode rodar a aplicação completa (API + Banco de Dados + Redis) com Docker Compose.
 
@@ -133,6 +133,7 @@ Se você ver caracteres estranhos (ex.: `Ã©`, `Ãª`), ajuste a codificação 
 ```powershell
 chcp 65001
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+$OutputEncoding = [System.Text.UTF8Encoding]::new()
 ```
 
 Depois disso, rode novamente o `Invoke-RestMethod`.
@@ -149,10 +150,12 @@ Medidas aplicadas no projeto:
    - Build determinístico usando `requirements.lock` para garantir versões consistentes.
 3. **Observabilidade**
    - Logs em JSON (`JSONFormatter`) para integração com ferramentas de monitoramento.
+   - Logs do LLM incluem modelo, tentativa e hash do prompt para auditoria de versões.
 4. **Resiliência**
    - Migrações automáticas via `entrypoint.sh`.
    - Rate limiting com Redis + SlowAPI.
    - Validação estrita de URL (apenas `wikipedia.org`) para reduzir risco de SSRF.
+   - Retentativas com backoff em chamadas ao LLM.
 
 ---
 
@@ -160,9 +163,11 @@ Medidas aplicadas no projeto:
 
 - Scraping limpo: remove elementos não textuais (ex.: tabelas e referências).
 - Sumarização com LLM: LangChain + OpenAI com fallback automático para modelo secundário.
+- Textos longos usam estratégia map-reduce por chunks para evitar limites de tokens.
 - Cache: persistência por URL + `word_count` para reduzir custo e latência.
 - Tradução opcional: PT-BR quando habilitado.
 - Tradução best-effort: se falhar, `summary_pt` fica `null` e `summary_pt_origin=error`.
+- Saída estruturada do LLM em JSON para reduzir variação e facilitar parsing.
 - Normalização de URL: URLs são normalizadas e forçadas para `https` para evitar duplicidade de cache.
 - Containerização: Docker + Docker Compose.
 
@@ -251,6 +256,7 @@ Busca um resumo já processado.
   "detail": "word_count must be <= 500."
 }
 ```
+Exemplo quando `SUMMARY_WORD_COUNT_MAX=500`.
 
 **404 Not Found** (resumo não encontrado no cache):
 ```json
@@ -295,6 +301,8 @@ As configurações são gerenciadas via variáveis de ambiente (arquivo `.env`).
 | `LOG_LEVEL` | **Obrigatório**. Nível de log (INFO, DEBUG, etc). | - |
 | `HTTP_TIMEOUT_SECONDS` | Timeout para requests HTTP da Wikipedia (segundos). | 10 |
 | `LLM_TIMEOUT_SECONDS` | Timeout para chamadas ao LLM (segundos). | 30 |
+| `LLM_MAX_RETRIES` | Quantidade de retentativas para chamadas ao LLM. | 2 |
+| `LLM_RETRY_BACKOFF_SECONDS` | Backoff base (segundos) entre retentativas do LLM. | 1.0 |
 | `WIKIPEDIA_USER_AGENT` | **Obrigatório**. User-Agent para requests ao Wikipedia. | - |
 | `WIKIPEDIA_MIN_ARTICLE_WORDS` | Mínimo de palavras extraídas para permitir resumo. | 50 |
 | `WIKIPEDIA_MAX_CONTENT_BYTES` | Máximo de bytes permitidos no download do artigo. | 2000000 |

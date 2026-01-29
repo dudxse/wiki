@@ -5,8 +5,8 @@ import pytest
 
 from app.core.config import get_settings
 from app.services.summarizer import (
-    TRANSLATION_ORIGIN_LLM,
     TRANSLATION_ORIGIN_DISABLED,
+    TRANSLATION_ORIGIN_LLM,
     TRANSLATION_ORIGIN_SKIPPED,
     TRANSLATION_ORIGIN_UNAVAILABLE,
     SummarizationError,
